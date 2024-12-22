@@ -24,8 +24,8 @@ with st.sidebar:
     st.header("Configure Your Summary")
     summary_length = st.selectbox("Summary Length", ["Short", "Medium", "Long"], index=1)
     search_topic = st.text_input("Topic-Based Search", placeholder="Enter a topic")
-    language = st.selectbox("Language for Audio", ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Punjabi", "Gujarati", "Odia", "Urdu", "Marathi"])
-    tts_enabled = st.checkbox("Enable Text-to-Speech")
+    language = st.selectbox("Language for Audio Summary", ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Punjabi", "Gujarati", "Odia", "Urdu", "Marathi"])
+    tts_enabled = st.checkbox("Enable Audio Summary")
 
 # Main content
 col1, col2 = st.columns([2, 1])
