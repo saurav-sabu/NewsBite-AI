@@ -13,6 +13,8 @@ st.set_page_config(page_title="NewsBite-AI", page_icon="\U0001F4F0", layout="wid
 st.title("📰 NewsBite-AI: AI-Based News Summarizer")
 st.markdown("---")
 
+st.info("Go to the sidebar to configure your summary settings.")
+
 # Initialize session state
 if "articles" not in st.session_state:
     st.session_state.articles = []
