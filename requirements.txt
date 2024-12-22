@@ -1,0 +1,12 @@
+langchain-google-genai
+python-dotenv
+streamlit
+langchain-core
+langchain-community
+duckduckgo-search
+phidata
+newspaper4k
+lxml_html_clean
+gTTS
+deep-translator
+-e .
