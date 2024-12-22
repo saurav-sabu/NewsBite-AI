@@ -24,7 +24,7 @@ with st.sidebar:
     st.header("Configure Your Summary")
     summary_length = st.selectbox("Summary Length", ["Short", "Medium", "Long"], index=1)
     search_topic = st.text_input("Topic-Based Search", placeholder="Enter a topic")
-    language = st.selectbox("Language", ["English", "Hindi", "Spanish", "French", "German", "Others"])
+    language = st.selectbox("Language for Audio", ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Punjabi", "Gujarati", "Odia", "Urdu", "Marathi"])
     tts_enabled = st.checkbox("Enable Text-to-Speech")
 
 # Main content
@@ -108,10 +108,26 @@ with col1:
 # Additional Features
 with col2:
     # Text-to-Speech Section
-    st.markdown("### Text-to-Speech")
+    st.markdown("### Listen To Audio Summary")
+    tts_language_codes = {
+            "Hindi": "hi",
+            "Tamil": "ta",
+            "Telugu": "te",
+            "Bengali": "bn",
+            "Kannada": "kn",
+            "Malayalam": "ml",
+            "Punjabi": "pa",
+            "Gujarati": "gu",
+            "Odia": "or",
+            "Urdu": "ur",
+            "Marathi": "mr"
+        }
+    
+    target_language_code = tts_language_codes.get(language, "en")
+
     if tts_enabled and st.session_state.selected_summary:
-        translated = GoogleTranslator(source='en', target='hi').translate(st.session_state.selected_summary["Summary"])
-        tts = gTTS(translated, lang='hi')
+        translated = GoogleTranslator(source='en', target=target_language_code).translate(st.session_state.selected_summary["Summary"])
+        tts = gTTS(translated, lang=target_language_code)
         tts.save('output.mp3')
         st.audio(data="output.mp3", format="audio/mp3", start_time=0)
     elif tts_enabled:
