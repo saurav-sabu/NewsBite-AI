@@ -5,7 +5,6 @@ from src.sentiment_analysis import analyze_sentiment  # Assuming you have a sent
 from gtts import gTTS
 from deep_translator import GoogleTranslator
 
-
 # Set page config
 st.set_page_config(page_title="NewsBite-AI", page_icon="\U0001F4F0", layout="wide")
 
@@ -20,13 +19,15 @@ if "articles" not in st.session_state:
     st.session_state.articles = []
 if "selected_summary" not in st.session_state:
     st.session_state.selected_summary = ""
+if "translated_summary" not in st.session_state:
+    st.session_state.translated_summary = ""
 
 # Sidebar for user inputs
 with st.sidebar:
     st.header("Configure Your Summary")
     summary_length = st.selectbox("Summary Length", ["Short", "Medium", "Long"], index=1)
     search_topic = st.text_input("Topic-Based Search", placeholder="Enter a topic")
-    language = st.selectbox("Language for Audio Summary", ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Punjabi", "Gujarati", "Odia", "Urdu", "Marathi"])
+    language = st.selectbox("Language for Summary", ["English", "Hindi", "Tamil", "Telugu", "Bengali", "Kannada", "Malayalam", "Punjabi", "Gujarati", "Odia", "Urdu", "Marathi"])
     tts_enabled = st.checkbox("Enable Audio Summary")
 
 # Main content
@@ -76,9 +77,32 @@ with col1:
                     response = get_summary_response(selected_article["text"], summary_length)
                 st.session_state.selected_summary = response
 
-            # Display the summary
-            st.markdown("### Your Summary")
+            # Display the English summary
+            st.markdown("### Your Summary (English)")
             st.write(st.session_state.selected_summary["Summary"])
+
+            # Translate and display the summary in the selected language
+            if language != "English":
+                target_language_code = {
+                    "Hindi": "hi",
+                    "Tamil": "ta",
+                    "Telugu": "te",
+                    "Bengali": "bn",
+                    "Kannada": "kn",
+                    "Malayalam": "ml",
+                    "Punjabi": "pa",
+                    "Gujarati": "gu",
+                    "Odia": "or",
+                    "Urdu": "ur",
+                    "Marathi": "mr"
+                }.get(language, "en")
+
+                with st.spinner("Translating summary..."):
+                    translated = GoogleTranslator(source='en', target=target_language_code).translate(st.session_state.selected_summary["Summary"])
+                    st.session_state.translated_summary = translated
+
+                st.markdown(f"### Your Summary ({language})")
+                st.write(st.session_state.translated_summary)
 
             # Sentiment Analysis for the Summary
             st.markdown("### Sentiment Analysis")
@@ -95,8 +119,31 @@ with col1:
                 # Generate summary for pasted article
                 response = get_summary_response(news_article, summary_length)
                 st.success("Summary Generated Successfully!")
-                st.markdown("### Your Summary")
-                st.write(response)
+                st.markdown("### Your Summary (English)")
+                st.write(response["Summary"])
+
+                # Translate and display the summary in the selected language
+                if language != "English":
+                    target_language_code = {
+                        "Hindi": "hi",
+                        "Tamil": "ta",
+                        "Telugu": "te",
+                        "Bengali": "bn",
+                        "Kannada": "kn",
+                        "Malayalam": "ml",
+                        "Punjabi": "pa",
+                        "Gujarati": "gu",
+                        "Odia": "or",
+                        "Urdu": "ur",
+                        "Marathi": "mr"
+                    }.get(language, "en")
+
+                    with st.spinner("Translating summary..."):
+                        translated = GoogleTranslator(source='en', target=target_language_code).translate(response["Summary"])
+                        st.session_state.translated_summary = translated
+
+                    st.markdown(f"### Your Summary ({language})")
+                    st.write(st.session_state.translated_summary)
 
                 # Sentiment Analysis for the Pasted Summary
                 sentiment_result = analyze_sentiment(news_article)
@@ -104,40 +151,35 @@ with col1:
                 st.write(f"**Tone:** {sentiment_result['tone']}")
                 st.metric(label="Confidence", value=f"{sentiment_result['confidence']}%")
 
-                # Option to download
-                st.download_button(label="Download Summary", data=response, file_name="summary.txt", mime="text/plain")
-
 # Additional Features
 with col2:
     # Text-to-Speech Section
     st.markdown("### Listen To Audio Summary")
     tts_language_codes = {
-            "Hindi": "hi",
-            "Tamil": "ta",
-            "Telugu": "te",
-            "Bengali": "bn",
-            "Kannada": "kn",
-            "Malayalam": "ml",
-            "Punjabi": "pa",
-            "Gujarati": "gu",
-            "Odia": "or",
-            "Urdu": "ur",
-            "Marathi": "mr"
-        }
-    
+        "Hindi": "hi",
+        "Tamil": "ta",
+        "Telugu": "te",
+        "Bengali": "bn",
+        "Kannada": "kn",
+        "Malayalam": "ml",
+        "Punjabi": "pa",
+        "Gujarati": "gu",
+        "Odia": "or",
+        "Urdu": "ur",
+        "Marathi": "mr"
+    }
+
     target_language_code = tts_language_codes.get(language, "en")
 
-    if tts_enabled and st.session_state.selected_summary:
-        translated = GoogleTranslator(source='en', target=target_language_code).translate(st.session_state.selected_summary["Summary"])
-        tts = gTTS(translated, lang=target_language_code)
+    if (tts_enabled and st.session_state.selected_summary) or (tts_enabled and st.session_state.translated_summary):
+        translated_for_tts = st.session_state.translated_summary if language != "English" else st.session_state.selected_summary["Summary"]
+        tts = gTTS(translated_for_tts, lang=target_language_code)
         tts.save('output.mp3')
         st.audio(data="output.mp3", format="audio/mp3", start_time=0)
     elif tts_enabled:
         st.info("TTS is enabled, but no summary is available to generate audio.")
 
-
+# Footer
 st.markdown("---")
-st.markdown(
-    "### Multilingual Support & Sharing\nSummarize news in multiple languages and share insights with your network."
-)
-st.text("[More features coming soon!]")
+st.markdown("**© 2024 NewsBite-AI | All rights reserved.**")
+
