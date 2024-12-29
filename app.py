@@ -6,7 +6,7 @@ from gtts import gTTS
 from deep_translator import GoogleTranslator
 
 # Set page config
-st.set_page_config(page_title="NewsBite-AI", page_icon="\U0001F4F0", layout="wide")
+st.set_page_config(page_title="NewsBite-AI", page_icon="\U0001F4F0", layout="wide", initial_sidebar_state="expanded")
 
 # App title
 st.title("📰 NewsBite-AI: AI-Based News Summarizer")
